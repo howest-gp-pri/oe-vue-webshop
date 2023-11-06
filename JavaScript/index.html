@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue webshop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app">
+        <div v-if="!loggedIn">
+            <p>{{ message }}</p>
+            <label for="username" class="text">username</label>
+            <input type="text" name="username" v-model="loginForm.username">
+            <br>
+            <label for="password" class="text">password</label>
+            <input type="text" name="password" v-model="loginForm.password">
+            <br>
+            <button v-on:click="loginUser">Login</button>
+        </div>
+
+        <div v-if="loggedIn">
+            <button v-bind:class="{red: loggedIn}" v-on:click="loggedIn = false">Logout</button>
+            <p>We have a lot of nice products to offer:</p>
+            <ul> 
+                <li v-for="(product, index) in products">#{{index + 1}}. {{product.name}} aan &euro; {{product.price}} ({{product.quantity === 0 ? "" : "nog "}}<span style="color:red;">{{product.quantity}}</span> in stock)</li>
+            </ul>
+
+            <button v-if="!addFormVisible" v-on:click="toggleForm">Add new product</button>
+
+            <form v-if="addFormVisible" v-on:submit.prevent="addNewProduct">
+                <label>name</label>
+                <input v-model="newProduct.name" type="text">
+                <br>
+                
+                <label>quantity</label>
+                <input v-model.number="newProduct.quantity" type="number">
+                <br>
+                
+                <label>price</label>
+                <input v-model.number="newProduct.price" type="number">
+                <br>
+                <input type="submit" value="Add new product">
+            </form>
+
+        </div>
+        <div v-else>
+            <p>Hello, please login!</p>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+    <script>
+        const app = new Vue({
+            el: '#app',
+            created: function() {
+                //Simulate API call fetch("api/products") ...
+                const self = this;
+                self.products = [
+                    { name: "Sliced peaches", quantity: 500, price: 1.50 },
+                    { name: "Pear halves", quantity: 0, price: 1.65 },
+                    { name: "Pineapple slices", quantity: 50, price: 1.39 },
+                    { name: "Tropical fruit salad", quantity: 820, price: 1.51 }
+                ];
+            },
+            data: {
+                message: "Hello world",
+                loggedIn: false,
+                addFormVisible: false,
+                loginForm: {
+                    username: "",
+                    password: ""
+                },
+                products: null,
+                newProduct: { name: "", quantity: 0, price: 0 }
+            },
+            methods: { 
+                loginUser: function () {
+
+                    const self = this;
+
+                    const logLogin = function() {
+                        alert(`User ${self.loginForm.username} logged in!`);
+                    }
+
+                    logLogin();
+
+                    self.message = `Hi, ${self.loginForm.username}`;
+                    self.loginForm.username = "";
+                    self.loginForm.password = "";
+                    self.loggedIn = true;
+
+                },
+                toggleForm: function() {
+                    const self = this;
+                    self.addFormVisible = !self.addFormVisible;
+                },
+                addNewProduct: function() {
+                    const self = this;
+                    self.products.push(self.newProduct);
+                    self.newProduct = { name: "", quantity: 0, price: 0 };
+                }
+            }
+        });
+    </script>
+</body>
+</html>
